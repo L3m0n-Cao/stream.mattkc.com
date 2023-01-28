@@ -1,0 +1,82 @@
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: black;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  font-size: 10pt;
+}
+
+.outer {
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+}
+
+.button {
+  background: #303030;
+  display: inline-block;
+  padding: 0.5em 1em;
+  user-select: none;
+  border-radius: 0.25em;
+}
+
+.button:hover {
+  background: #404040;
+}
+
+.button:active {
+  background: #202020;
+}
+
+input[type="number"] {
+  background: #303030;
+  color: white;
+  border: 1px #808080 solid;
+}
+
+textarea {
+  font-family: 'Roboto', sans-serif;
+  font-size: 10pt;
+  background: #303030;
+  color: white;
+  padding: 0.5em;
+  border-radius: 0.25em;
+}
+
+::-webkit-scrollbar{
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track-piece{
+  background-color: #202020;
+}
+
+::-webkit-scrollbar-thumb{
+  background-color: #404040;
+  outline: 2px solid #000;
+  outline-offset: -2px;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background-color: #606060;
+}
+
+a:link, a:visited {
+  color: #a0a0ff;
+}
+
+a:hover {
+  color: #c0c0ff;
+}
+
+a:active {
+  color: #8080ff;
+}

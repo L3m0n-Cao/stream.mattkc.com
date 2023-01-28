@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width">
+<title>MattKC Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lato&family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+<style type="text/css">
+.main {
+  height: 100%;
+  display: flex;
+}
+
+.section {
+  height: 100%;
+  position: relative;
+}
+
+.video {
+
+}
+
+iframe {
+  display: block;
+}
+
+.chat {
+}
+
+.splitter {
+  background: #181818;
+  user-select: none;
+  width: 4px;
+  cursor: col-resize;
+  height: 100%;
+}
+
+.splitter:hover {
+  background: #282828;
+}
+
+#player {
+  display: none;
+}
+
+.homePage {
+  background: rgba(0, 0, 0, 0.66);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  text-align: center;
+  display: none;
+}
+
+.homePageInner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 480px;
+  max-width: 100%;
+  transform: translateX(-50%) translateY(-50%);
+  text-shadow: 1px 1px 2px black;
+  user-select: none;
+  line-height: 150%;
+}
+</style>
+<script src="cookies.js"></script>
+<script>
+var chatWidth = 320;
+
+function updateVideo() {
+  var player = $("#player");
+  player.show();
+}
+
+$(document).ready(function(){
+  // Read last chat size from cookies
+  var cookies = GetCookies();
+  var cookieChatWidth = cookies['chat-width'];
+  if (cookieChatWidth != null && !isNaN(cookieChatWidth)) {
+    chatWidth = cookieChatWidth;
+  }
+
+  if (cookies['auth'] == null) {
+    $(".homePage").show();
+  }
+
+  // Catch resize events from window to re-align chat under video
+  const LAYOUT_NONE = 0;
+  const LAYOUT_HORIZ = 1;
+  const LAYOUT_VERT = 2;
+  var currentLayout = LAYOUT_NONE;
+  $(window).resize(function(){
+    var aspect = $(window).width() / $(window).height();
+
+    var newLayout = (aspect < 1.0) ? LAYOUT_VERT : LAYOUT_HORIZ;
+
+    if (newLayout != currentLayout) {
+      currentLayout = newLayout;
+      if (currentLayout == LAYOUT_VERT) {
+        $('.main').css('flex-flow', 'column');
+        $('.splitter').hide();
+        $('.video').css('flex-grow', '');
+        $('.chat').css({
+          'width': '100%',
+        });
+      } else {
+        $('.main').css('flex-flow', 'row');
+        $('.splitter').show();
+        $('.video').css({
+          'flex-grow': '100',
+          'min-height': '',
+          'max-height': ''
+        });
+        $('.chat').css({
+          'width': chatWidth + 'px',
+        });
+      }
+    }
+
+    if (currentLayout == LAYOUT_VERT) {
+      var videoSection = $('.video');
+      var w = videoSection.width();
+      var h = w / 16 * 9;
+
+      videoSection.css({
+        'min-height': h + 'px',
+        'max-height': h + 'px'
+      });
+    }
+  });
+  $(window).resize();
+
+  var splitter = $(".splitter");
+  splitter.mousedown(function(e){
+    var startPos = e.pageX;
+    var page = $(document.body);
+
+    // Disable pointer events on the iframe so we receive mousemoves through it
+    $("iframe").css('pointer-events', 'none');
+
+    function reportMovement(e) {
+      $("#chat-section").css('width', chatWidth - (e.pageX - startPos) + 'px');
+    }
+
+    function endMovement(e) {
+      page.off('mousemove', reportMovement);
+      page.off('mouseup', endMovement);
+
+      // Restore iframe's pointer events
+      $("iframe").css('pointer-events', 'auto');
+
+      chatWidth = chatWidth - (e.pageX - startPos);
+      document.cookie = "chat-width=" + chatWidth;
+    }
+
+    page.on('mousemove', reportMovement).on('mouseup', endMovement);
+  });
+
+  updateVideo();
+  setInterval(updateVideo, 10000);
+
+  $(".homePage").click(function(){
+    $(".homePage").hide();
+  });
+
+  $("#homePPLink").click(function(e){
+    e.stopPropagation();
+  });
+});
+</script>
+</head>
+<body>
+<div class="main">
+<div class="video section">
+<iframe id="player" width="100%" height="100%" src="https://www.youtube.com/embed/5pXJZKZDzHg?&autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div><div class="splitter section">
+</div><div class="chat section" id="chat-section">
+<iframe width="100%" height="100%" src="chat.html" frameborder="0"></iframe>
+</div>
+<div class="homePage">
+  <div class="homePageInner">
+    <h2>Welcome to MattKC Live!</h2>
+    <p>
+      This is a custom live chat for MattKC streams. You can log in with your
+      existing Google account to start contributing and interacting with the
+      stream.
+    </p>
+    <p style="cursor: pointer;"><b>Click anywhere to continue</b></p>
+    <p style="font-size: 8pt;"><a href="privacy.html" target="_blank" id="homePPLink">Privacy Policy</a></p>
+  </div>
+</div>
+</body>
+</html>
